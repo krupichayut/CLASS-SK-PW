@@ -1,0 +1,70 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    // ฟังก์ชันตรวจสอบการยืนยันตัวตน
+    function isAuthenticated() {
+      return request.auth != null;
+    }
+    
+    // 1. Audit Logs (PDPA & Compliance)
+    // อนุญาตให้อ่านและเพิ่มข้อมูลใหม่ (Create) เท่านั้น
+    // ห้ามแก้ไข (Update) หรือลบ (Delete) เด็ดขาด เพื่อป้องกันการทำลายหลักฐาน
+    match /auditLogs/{logId} {
+      allow read: if true;
+      allow create: if true;
+      allow update, delete: if false; // Immutable Append-Only
+    }
+    
+    // 2. ข้อมูลนักเรียน (Students)
+    match /students/{studentId} {
+      allow read, write: if true;
+    }
+    
+    // 3. คะแนนและคอลัมน์คะแนน (Scores & ScoreColumns)
+    match /scores/{scoreId} {
+      allow read, write: if true;
+    }
+    
+    match /scoreColumns/{columnId} {
+      allow read, write: if true;
+    }
+    
+    // 4. เวลาเรียน (Attendance)
+    match /attendance/{attendanceId} {
+      allow read, write: if true;
+    }
+    
+    // 5. การประเมินคุณลักษณะและสมรรถนะ (Assessments)
+    match /assessments/{assessmentId} {
+      allow read, write: if true;
+    }
+    
+    // 6. ข้อมูลสถานศึกษาและวิชา (Schools & Subjects)
+    match /schools/{schoolId} {
+      allow read, write: if true;
+    }
+    
+    match /subjects/{subjectId} {
+      allow read, write: if true;
+    }
+    
+    // 7. ห้องเรียน และ โครงสร้างหน่วยการเรียนรู้
+    match /classrooms/{classroomId} {
+      allow read, write: if true;
+    }
+
+    match /learningUnits/{unitId} {
+      allow read, write: if true;
+    }
+
+    // 8. การตั้งค่าระบบ และ ข้อมูลปีการศึกษา (Settings & Academic Years)
+    match /settings/{settingId} {
+      allow read, write: if true;
+    }
+
+    match /academicYears/{academicYearId} {
+      allow read, write: if true;
+    }
+  }
+}

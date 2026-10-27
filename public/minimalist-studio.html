@@ -1,0 +1,1397 @@
+<!DOCTYPE html>
+<html lang="th" class="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ปพ.5 STUDIO — Minimalist Spatial Edition</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Google Fonts: Anuphan & JetBrains Mono -->
+  <link href="https://fonts.googleapis.com/css2?family=Anuphan:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Anuphan', 'sans-serif'],
+            mono: ['JetBrains Mono', 'monospace'],
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    body {
+      background-color: #090a0f;
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(255, 255, 255, 0.04) 0%, transparent 55%),
+        linear-gradient(to bottom, #090a0f 0%, #050508 100%);
+      color: #e4e4e7;
+      overflow-x: hidden;
+    }
+
+    /* Subtle architectural dot matrix */
+    .studio-dots {
+      background-image: radial-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+      background-size: 24px 24px;
+    }
+
+    /* Matte Tactile Glass Panels */
+    .glass-panel {
+      background: rgba(18, 19, 26, 0.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255, 255, 255, 0.07);
+      box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.7), inset 0 1px 0 0 rgba(255, 255, 255, 0.06);
+    }
+
+    .glass-card {
+      background: rgba(24, 26, 35, 0.7);
+      border: 1px solid rgba(255, 255, 255, 0.06);
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .glass-card:hover {
+      background: rgba(30, 33, 44, 0.85);
+      border-color: rgba(255, 255, 255, 0.14);
+      transform: translateY(-2px);
+    }
+    .glass-card.selected {
+      background: rgba(34, 38, 52, 0.95);
+      border: 1px solid rgba(255, 255, 255, 0.32);
+      box-shadow: 0 12px 30px -10px rgba(0, 0, 0, 0.8), inset 0 1px 0 0 rgba(255, 255, 255, 0.15);
+    }
+
+    /* Focus Inspector Card */
+    .inspector-card {
+      background: linear-gradient(165deg, rgba(28, 30, 42, 0.95) 0%, rgba(16, 17, 24, 0.98) 100%);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.85), inset 0 1px 0 0 rgba(255, 255, 255, 0.12);
+    }
+
+    /* Sidebar Navigation Active State */
+    .nav-item.active {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: rgba(255, 255, 255, 0.18);
+      color: #ffffff;
+    }
+
+    /* Refined Minimalist Sliders */
+    input[type="range"].studio-slider {
+      -webkit-appearance: none;
+      width: 100%;
+      height: 5px;
+      border-radius: 999px;
+      background: #27272a;
+      outline: none;
+    }
+    input[type="range"].studio-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      background: #f4f4f5;
+      border: 2px solid #090a0f;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+      cursor: pointer;
+      transition: transform 0.15s ease;
+    }
+    input[type="range"].studio-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+      background: #ffffff;
+    }
+
+    /* Tactile Brushed Metal Rotary Knob */
+    .tactile-knob {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      background: conic-gradient(from 180deg, #18181b, #27272a, #18181b);
+      border: 1px solid rgba(255, 255, 255, 0.18);
+      box-shadow: 0 6px 12px rgba(0, 0, 0, 0.6), inset 0 1px 1px rgba(255, 255, 255, 0.1);
+      position: relative;
+      cursor: pointer;
+      transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+    .tactile-knob::after {
+      content: '';
+      position: absolute;
+      top: 5px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 2px;
+      height: 8px;
+      border-radius: 2px;
+      background: #ffffff;
+    }
+
+    /* Subtle Connecting Lines */
+    @keyframes subtleFlow {
+      to { stroke-dashoffset: -80; }
+    }
+    .connector-line {
+      stroke-dasharray: 4 4;
+      animation: subtleFlow 8s linear infinite;
+    }
+
+    ::-webkit-scrollbar { width: 5px; height: 5px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.15); border-radius: 999px; }
+
+    /* Print Mode */
+    @media print {
+      body * { visibility: hidden; }
+      #blueprintModal, #blueprintModal * { visibility: visible; }
+      #blueprintModal {
+        position: absolute;
+        left: 0;
+        top: 0;
+        width: 100%;
+        background: #ffffff !important;
+        color: #000000 !important;
+        padding: 0 !important;
+      }
+      .no-print { display: none !important; }
+    }
+  </style>
+</head>
+<body class="min-h-screen studio-dots select-none text-zinc-200 antialiased">
+
+  <div class="max-w-[1620px] mx-auto p-3 lg:p-5 flex flex-col gap-4 min-h-screen">
+
+    <!-- ================= TOP STUDIO COMMAND BAR ================= -->
+    <header class="glass-panel rounded-2xl px-5 py-3 flex flex-wrap items-center justify-between gap-4">
+      <!-- Brand Identity -->
+      <div class="flex items-center gap-3.5">
+        <div class="w-10 h-10 rounded-xl bg-zinc-900 border border-zinc-700/80 flex items-center justify-center shadow-inner">
+          <span class="font-mono font-bold text-white text-sm tracking-tighter">ปพ.5</span>
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <h1 class="text-base font-bold tracking-tight text-white">ปพ.5 STUDIO</h1>
+            <span class="text-[10px] font-mono uppercase tracking-widest px-2 py-0.5 rounded bg-zinc-800 text-zinc-300 border border-zinc-700">OBEC SPATIAL OS</span>
+          </div>
+          <p class="text-[11px] text-zinc-500">ระบบประมวลผลและเชื่อมโยงเอกสารประเมินผลระดับประถมศึกษา</p>
+        </div>
+      </div>
+
+      <!-- Course Context Switcher -->
+      <div class="flex flex-wrap items-center gap-3 bg-zinc-950/90 border border-zinc-800 rounded-xl px-4 py-1.5">
+        <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+        <span class="text-xs font-medium text-zinc-300">โรงเรียนบ้านควนเนียง</span>
+        <span class="text-zinc-700">/</span>
+        <select id="courseSelect" onchange="switchCourse()" class="bg-transparent text-white font-semibold text-xs focus:outline-none cursor-pointer">
+          <option value="sub_soc_13101" class="bg-zinc-900 text-white" selected>วิชา สังคมศึกษา ป.3 (ส13101)</option>
+          <option value="sub_his_13102" class="bg-zinc-900 text-white">วิชา ประวัติศาสตร์ ป.3 (ส13102)</option>
+          <option value="sub_soc_14101" class="bg-zinc-900 text-white">วิชา สังคมศึกษา ป.4 (ส14101)</option>
+          <option value="sub_his_14102" class="bg-zinc-900 text-white">วิชา ประวัติศาสตร์ ป.4 (ส14102)</option>
+          <option value="sub_soc_15101" class="bg-zinc-900 text-white">วิชา สังคมศึกษา ป.5 (ส15101)</option>
+          <option value="sub_rem_15901" class="bg-zinc-900 text-white">วิชา ซ่อมเสริม ป.5 (สป15901)</option>
+          <option value="sub_soc_16101" class="bg-zinc-900 text-white">วิชา สังคมศึกษา ป.6 (ส16101)</option>
+        </select>
+        <span class="text-zinc-700 hidden sm:inline">/</span>
+        <select id="semesterSelect" onchange="renderAll()" class="bg-zinc-800/80 text-zinc-300 border border-zinc-700 rounded-lg px-2.5 py-0.5 text-[11px] font-medium focus:outline-none cursor-pointer">
+          <option value="all" class="bg-zinc-900">รวมตลอดปีการศึกษา 2569</option>
+          <option value="1" class="bg-zinc-900">ภาคเรียนที่ 1/2569</option>
+          <option value="2" class="bg-zinc-900">ภาคเรียนที่ 2/2569</option>
+        </select>
+      </div>
+
+      <!-- Clock & Sync Status -->
+      <div class="flex items-center gap-4">
+        <div class="text-right">
+          <div id="digitalClock" class="font-mono text-sm font-semibold text-zinc-200 tracking-wider">13:54:00</div>
+          <div class="flex items-center justify-end gap-1.5 text-[10px] text-zinc-500 font-mono">
+            <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+            <span id="syncTracker">LOCAL-FIRST SYNCED</span>
+          </div>
+        </div>
+        <button onclick="resetDemoData()" class="px-3 py-1.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-400 hover:text-white text-xs transition">
+          รีเซ็ตค่า
+        </button>
+      </div>
+    </header>
+
+    <!-- ================= MAIN 3-COLUMN WORKSPACE ================= -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-4 flex-1">
+
+      <!-- 1. LEFT NAVIGATION (MINIMALIST SIDEBAR) -->
+      <aside class="lg:col-span-2 glass-panel rounded-2xl p-3 flex flex-col justify-between">
+        <div>
+          <div class="text-[10px] font-mono tracking-widest text-zinc-500 uppercase mb-2.5 px-2">
+            WORKSPACE MODULES
+          </div>
+
+          <nav class="space-y-1">
+            <button onclick="switchModule('cosmic')" id="nav-cosmic" class="nav-item active w-full text-left px-3 py-2.5 rounded-xl border border-transparent flex items-center gap-3 text-zinc-400 hover:text-zinc-200 transition">
+              <span class="font-mono text-xs text-zinc-500">01</span>
+              <div>
+                <div class="text-xs font-semibold">ภาพรวมโหนดห้องเรียน</div>
+                <div class="text-[10px] text-zinc-500">Spatial Overview</div>
+              </div>
+            </button>
+
+            <button onclick="switchModule('helix')" id="nav-helix" class="nav-item w-full text-left px-3 py-2.5 rounded-xl border border-transparent flex items-center gap-3 text-zinc-400 hover:text-zinc-200 transition">
+              <span class="font-mono text-xs text-zinc-500">02</span>
+              <div>
+                <div class="text-xs font-semibold">ตารางวิถีคะแนน</div>
+                <div class="text-[10px] text-zinc-500">Scorebook Matrix</div>
+              </div>
+            </button>
+
+            <button onclick="switchModule('orbit')" id="nav-orbit" class="nav-item w-full text-left px-3 py-2.5 rounded-xl border border-transparent flex items-center gap-3 text-zinc-400 hover:text-zinc-200 transition">
+              <span class="font-mono text-xs text-zinc-500">03</span>
+              <div>
+                <div class="text-xs font-semibold">เช็คชื่อ & เวลาเรียน</div>
+                <div class="text-[10px] text-zinc-500">Attendance Grid</div>
+              </div>
+            </button>
+
+            <button onclick="switchModule('vibe')" id="nav-vibe" class="nav-item w-full text-left px-3 py-2.5 rounded-xl border border-transparent flex items-center gap-3 text-zinc-400 hover:text-zinc-200 transition">
+              <span class="font-mono text-xs text-zinc-500">04</span>
+              <div>
+                <div class="text-xs font-semibold">คุณลักษณะ & อ่านคิดเขียน</div>
+                <div class="text-[10px] text-zinc-500">Qualitative Eval</div>
+              </div>
+            </button>
+
+            <button onclick="switchModule('retrofit')" id="nav-retrofit" class="nav-item w-full text-left px-3 py-2.5 rounded-xl border border-transparent flex items-center justify-between text-zinc-400 hover:text-zinc-200 transition">
+              <div class="flex items-center gap-3">
+                <span class="font-mono text-xs text-zinc-500">05</span>
+                <div>
+                  <div class="text-xs font-semibold">งานค้าง & ซ่อมเสริม</div>
+                  <div class="text-[10px] text-zinc-500">Remedial Tracker</div>
+                </div>
+              </div>
+              <span id="sidebarRetrofitBadge" class="px-1.5 py-0.5 text-[10px] font-mono font-semibold rounded-md bg-amber-500/15 text-amber-400 border border-amber-500/30">1</span>
+            </button>
+          </nav>
+
+          <!-- Minimalist Course Ratio Box -->
+          <div class="mt-5 p-3 rounded-xl bg-zinc-950/60 border border-zinc-800/80 text-[11px] space-y-1.5 text-zinc-400">
+            <div class="flex justify-between">
+              <span>สัดส่วนคะแนน</span>
+              <span class="font-mono text-zinc-200">70 : 30</span>
+            </div>
+            <div class="flex justify-between">
+              <span>ระหว่างทาง / ปลายทาง</span>
+              <span class="font-mono text-zinc-200">35 / 35</span>
+            </div>
+            <div class="flex justify-between">
+              <span>กลางปี / ปลายปี</span>
+              <span class="font-mono text-zinc-200">15 / 15</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Clean Export Blueprint Button -->
+        <button onclick="openBlueprintModal()" class="mt-4 w-full p-3 rounded-xl bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs flex items-center justify-between transition shadow-lg">
+          <div class="text-left">
+            <div class="font-bold">พิมพ์เอกสาร ปพ.5</div>
+            <div class="text-[10px] text-zinc-600 font-mono">Official PDF Blueprint</div>
+          </div>
+          <span class="font-mono text-sm">↗</span>
+        </button>
+      </aside>
+
+      <!-- 2. CENTER WORKSPACE -->
+      <main class="lg:col-span-7 glass-panel rounded-2xl p-5 flex flex-col justify-between relative overflow-hidden">
+
+        <!-- Top Bar with Clean Monochrome Gauges -->
+        <div class="flex flex-wrap items-center justify-between gap-4 border-b border-zinc-800/80 pb-4 z-10">
+          <div>
+            <div id="moduleSubHeader" class="text-[10px] font-mono tracking-widest text-zinc-500 uppercase">
+              SPATIAL NODE INSPECTOR & GRADE LINKAGE
+            </div>
+            <h2 id="moduleMainTitle" class="text-base sm:text-lg font-bold text-white mt-0.5">
+              โครงข่ายข้อมูลผู้เรียนรายบุคคล (คลิกเลือกการ์ดเพื่อปรับคะแนนและดูความเชื่อมโยง)
+            </h2>
+          </div>
+
+          <!-- Minimalist Dual Rings -->
+          <div class="flex items-center gap-3">
+            <div class="flex items-center gap-3 bg-zinc-950/80 border border-zinc-800 rounded-xl px-3.5 py-2">
+              <div class="relative w-10 h-10 flex items-center justify-center">
+                <svg class="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-zinc-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path id="gaugeCompletenessArc" class="text-zinc-200" stroke-dasharray="84, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <span id="gaugeCompletenessVal" class="text-[10px] font-mono font-semibold text-white">84%</span>
+              </div>
+              <div>
+                <div class="text-[11px] text-zinc-300 font-medium">คะแนนเฉลี่ยห้อง</div>
+                <div class="text-[10px] text-zinc-500 font-mono">Class Mean</div>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-3 bg-zinc-950/80 border border-zinc-800 rounded-xl px-3.5 py-2">
+              <div class="relative w-10 h-10 flex items-center justify-center">
+                <svg class="w-10 h-10 -rotate-90" viewBox="0 0 36 36">
+                  <path class="text-zinc-800" stroke-width="3" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                  <path id="gaugeAttendanceArc" class="text-emerald-400" stroke-dasharray="95, 100" stroke-width="3" stroke-linecap="round" stroke="currentColor" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"/>
+                </svg>
+                <span id="gaugeAttendanceVal" class="text-[10px] font-mono font-semibold text-emerald-400">95%</span>
+              </div>
+              <div>
+                <div class="text-[11px] text-zinc-300 font-medium">เวลาเรียนเฉลี่ย</div>
+                <div class="text-[10px] text-zinc-500 font-mono">Attendance</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ================= MODULE 1: SPATIAL OVERVIEW ================= -->
+        <section id="mod-cosmic" class="my-4 flex-1 grid grid-cols-1 md:grid-cols-12 gap-5 items-center relative z-10">
+          <!-- Subtle Architectural Connector Lines -->
+          <svg class="hidden md:block absolute inset-0 w-full h-full pointer-events-none z-0" xmlns="http://www.w3.org/2000/svg">
+            <path d="M 320 120 C 390 105, 420 85, 485 90" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" fill="none" class="connector-line" />
+            <path d="M 320 215 C 390 215, 420 220, 485 225" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" fill="none" class="connector-line" />
+            <path d="M 320 310 C 390 325, 420 355, 485 360" stroke="rgba(255,255,255,0.14)" stroke-width="1.5" fill="none" class="connector-line" />
+          </svg>
+
+          <!-- LEFT: ACTIVE STUDENT INSPECTOR CARD -->
+          <div class="md:col-span-6 inspector-card rounded-2xl p-5 relative z-10">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-3.5">
+                <div id="holoAvatar" class="w-12 h-12 rounded-xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-2xl">👦🏻</div>
+                <div>
+                  <h3 id="holoName" class="text-base font-bold text-white">ด.ช. ศุภกิตติ์ พลอยดี</h3>
+                  <div class="flex items-center gap-2 mt-0.5">
+                    <span id="holoCode" class="font-mono text-xs text-zinc-400">NO. 001</span>
+                    <span id="holoGradePill" class="text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30">เกรด 4</span>
+                  </div>
+                </div>
+              </div>
+              <div class="text-right">
+                <span class="text-[10px] font-mono text-zinc-500 block">TOTAL SCORE</span>
+                <span id="holoPassBadge" class="font-mono text-lg font-bold text-white">93 <span class="text-xs text-zinc-500">/100</span></span>
+              </div>
+            </div>
+
+            <!-- Tactile Rotary Dials (Midterm & Final) -->
+            <div class="mt-4 p-3.5 rounded-xl bg-zinc-950/80 border border-zinc-800/90 flex items-center justify-between gap-3">
+              <div class="flex items-center gap-4">
+                <div class="text-center">
+                  <div class="text-[10px] text-zinc-500 mb-1">สอบกลางปี</div>
+                  <div id="knobMidterm" onclick="rotateKnob('midterm')" title="คลิกเพื่อปรับคะแนนสอบกลางปี" class="tactile-knob mx-auto"></div>
+                  <div class="text-[11px] font-mono text-zinc-300 mt-1.5"><span id="knobMidVal">14</span>/15</div>
+                </div>
+                <div class="text-center">
+                  <div class="text-[10px] text-zinc-500 mb-1">สอบปลายปี</div>
+                  <div id="knobFinal" onclick="rotateKnob('final')" title="คลิกเพื่อปรับคะแนนสอบปลายปี" class="tactile-knob mx-auto"></div>
+                  <div class="text-[11px] font-mono text-zinc-300 mt-1.5"><span id="knobFinVal">14</span>/15</div>
+                </div>
+              </div>
+
+              <!-- Minimalist Trend Graph -->
+              <div class="flex-1 pl-4 border-l border-zinc-800/80 text-right">
+                <div class="text-[10px] font-mono text-zinc-400">CONSISTENCY TREND</div>
+                <svg class="w-full h-9 mt-1" viewBox="0 0 120 32" fill="none">
+                  <path d="M2 24 Q 18 14, 34 20 T 68 12 T 100 14 T 118 8" stroke="#e4e4e7" stroke-width="1.75" fill="none"/>
+                  <path d="M2 29 L 118 29" stroke="rgba(255,255,255,0.08)" stroke-width="1"/>
+                </svg>
+              </div>
+            </div>
+
+            <!-- Formative Score Slider (ระหว่างทาง) -->
+            <div class="mt-3.5 p-3.5 rounded-xl bg-zinc-900/70 border border-zinc-800">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-medium text-zinc-200">คะแนนตัวชี้วัดระหว่างทาง (Formative)</span>
+                <span class="font-mono text-xs font-semibold text-white"><span id="holoFormativeText">33</span> / 35</span>
+              </div>
+              <input id="holoFormativeSlider" type="range" min="0" max="35" value="33" oninput="updateFromHolo('formative', this.value)" class="studio-slider" />
+              <div class="flex justify-between text-[10px] text-zinc-500 mt-1.5">
+                <span>หน่วยการเรียนรู้ที่ 1–3</span>
+                <span>เชื่อมโยงสมรรถนะอัตโนมัติ</span>
+              </div>
+            </div>
+
+            <!-- Summative Score Slider (ปลายทาง) -->
+            <div class="mt-2.5 p-3.5 rounded-xl bg-zinc-900/70 border border-zinc-800">
+              <div class="flex justify-between items-center mb-2">
+                <span class="text-xs font-medium text-zinc-200">คะแนนตัวชี้วัดปลายทาง (Summative)</span>
+                <span class="font-mono text-xs font-semibold text-white"><span id="holoSummativeText">32</span> / 35</span>
+              </div>
+              <input id="holoSummativeSlider" type="range" min="0" max="35" value="32" oninput="updateFromHolo('summative', this.value)" class="studio-slider" />
+              <div class="flex justify-between text-[10px] mt-1.5">
+                <span class="text-zinc-500">เกณฑ์ผ่านขั้นต่ำ ≥ 18 คะแนน</span>
+                <span id="holoSummativeStatus" class="text-emerald-400 font-medium">✓ ผ่านเกณฑ์ปลายทาง</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- RIGHT OF CENTER: CONNECTED STUDENT NODE CARDS -->
+          <div id="constellationNodesList" class="md:col-span-6 space-y-2.5 max-h-[430px] overflow-y-auto pr-1 relative z-10">
+            <!-- Rendered by JS -->
+          </div>
+        </section>
+
+        <!-- ================= MODULE 2: SCOREBOOK MATRIX ================= -->
+        <section id="mod-helix" class="hidden my-4 flex-1 overflow-x-auto z-10">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="text-xs text-zinc-400">
+              แก้ไขคะแนนได้โดยตรงในตาราง • รวม 100 คะแนน (ระหว่างทาง 35 + ปลายทาง 35 + กลางปี 15 + ปลายปี 15)
+            </div>
+            <button onclick="bonusAllStudents(1)" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-medium transition">
+              +1 คะแนนระหว่างทางทั้งห้อง
+            </button>
+          </div>
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-zinc-950 border-b border-zinc-800 text-zinc-400 font-mono text-[11px]">
+                <th class="p-3 rounded-tl-xl">NO.</th>
+                <th class="p-3 font-sans">ชื่อ - นามสกุล</th>
+                <th class="p-3 text-center">ระหว่างทาง (35)</th>
+                <th class="p-3 text-center">ปลายทาง (35)</th>
+                <th class="p-3 text-center">กลางปี (15)</th>
+                <th class="p-3 text-center">ปลายปี (15)</th>
+                <th class="p-3 text-center text-white">รวม (100)</th>
+                <th class="p-3 text-center text-white rounded-tr-xl">เกรด</th>
+              </tr>
+            </thead>
+            <tbody id="helixTableBody" class="divide-y divide-zinc-800/60"></tbody>
+          </table>
+        </section>
+
+        <!-- ================= MODULE 3: ATTENDANCE GRID ================= -->
+        <section id="mod-orbit" class="hidden my-4 flex-1 overflow-x-auto z-10">
+          <!-- Date Selector Ribbon -->
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4 p-3 rounded-2xl bg-zinc-950/80 border border-zinc-800">
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="text-xs text-zinc-400 font-semibold">📅 วันที่เช็กชื่อ:</span>
+              <button onclick="shiftOrbitDate(-1)" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs transition border border-zinc-700/60" title="วันก่อนหน้า (ย้อนหลัง 1 วัน)">◀</button>
+              <input type="date" id="orbitDateInput" onchange="onOrbitDateChange(this.value)" class="px-3 py-1 rounded-lg bg-zinc-900 border border-zinc-700 text-xs font-mono font-bold text-white outline-none cursor-pointer">
+              <button onclick="shiftOrbitDate(1)" class="p-1.5 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 text-xs transition border border-zinc-700/60" title="วันถัดไป (ไปข้างหน้า 1 วัน)">▶</button>
+              <button onclick="setOrbitDateToday()" class="px-2.5 py-1 rounded-lg bg-indigo-950/80 hover:bg-indigo-900 text-indigo-300 border border-indigo-700/60 text-xs font-bold transition">วันนี้</button>
+              <span id="orbitThaiDateLabel" class="text-xs font-bold text-zinc-300 ml-1"></span>
+            </div>
+            <div class="flex items-center gap-2">
+              <button onclick="setAllAttendance100()" class="px-3 py-1.5 rounded-lg bg-emerald-950/50 hover:bg-emerald-900/60 text-emerald-300 border border-emerald-700/60 text-xs font-bold transition">
+                ✓ เช็กมาครบ 100% ทั้งห้อง
+              </button>
+            </div>
+          </div>
+
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="flex items-center gap-4 text-xs text-zinc-400">
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-zinc-200 inline-block"></span> มาเรียน (/)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-amber-400 inline-block"></span> ลา (ล)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2 h-2 rounded-full bg-rose-500 inline-block"></span> ขาด (ข)</span>
+            </div>
+          </div>
+          <div id="orbitAttendanceContainer" class="space-y-2"></div>
+        </section>
+
+        <!-- ================= MODULE 4: QUALITATIVE MATRIX ================= -->
+        <section id="mod-vibe" class="hidden my-4 flex-1 overflow-x-auto z-10">
+          <div class="flex flex-wrap items-center justify-between gap-2 mb-3">
+            <div class="text-xs text-zinc-400">
+              คลิกที่ระดับคุณภาพเพื่อสลับค่า (`3` ดีเยี่ยม, `2` ดี, `1` ผ่าน)
+            </div>
+            <button onclick="syncVibeFromScores()" class="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 border border-zinc-700 text-xs font-medium transition">
+              ซิงค์ระดับคุณภาพตามคะแนนรวมอัตโนมัติ
+            </button>
+          </div>
+          <table class="w-full text-left border-collapse text-xs">
+            <thead>
+              <tr class="bg-zinc-950 border-b border-zinc-800 text-zinc-400">
+                <th class="p-3">ชื่อนักเรียน</th>
+                <th class="p-2.5 text-center">คุณลักษณะฯ ข้อ 1–4</th>
+                <th class="p-2.5 text-center">คุณลักษณะฯ ข้อ 5–8</th>
+                <th class="p-2.5 text-center text-white">สรุปคุณลักษณะฯ</th>
+                <th class="p-2.5 text-center text-white">อ่าน คิดวิเคราะห์ เขียน</th>
+                <th class="p-2.5 text-center text-white">สมรรถนะ 5 ด้าน</th>
+              </tr>
+            </thead>
+            <tbody id="vibeTableBody" class="divide-y divide-zinc-800/60"></tbody>
+          </table>
+        </section>
+
+        <!-- ================= MODULE 5: REMEDIAL TRACKER ================= -->
+        <section id="mod-retrofit" class="hidden my-4 flex-1 z-10">
+          <div id="retrofitListContainer" class="space-y-2.5"></div>
+        </section>
+
+        <!-- Center Footer -->
+        <div class="pt-3 border-t border-zinc-800/80 flex flex-wrap items-center justify-between gap-2 text-[11px] text-zinc-500 z-10">
+          <span>ข้อมูลเชื่อมโยงเข้ากับตารางหน้าปก เวลาเรียน และผลประเมินคุณลักษณะฯ แบบ Real-time</span>
+          <button onclick="addNewStudentModal()" class="px-3 py-1 rounded-lg bg-zinc-900 hover:bg-zinc-800 text-zinc-300 border border-zinc-800 transition font-medium">
+            + เพิ่มนักเรียน
+          </button>
+        </div>
+      </main>
+
+      <!-- 3. RIGHT INTERACTIVE HUB: MINIMALIST RADAR & INSIGHT -->
+      <aside class="lg:col-span-3 glass-panel rounded-2xl p-5 flex flex-col justify-between">
+        <div>
+          <div class="text-[10px] font-mono tracking-widest text-zinc-500 uppercase mb-1">
+            QUALITATIVE RADAR
+          </div>
+          <h3 class="text-sm font-bold text-white">สัดส่วนคุณลักษณะ & สมรรถนะ</h3>
+          <p class="text-[11px] text-zinc-500 mt-0.5">วิเคราะห์จากเวลาเรียน คะแนน และชิ้นงาน</p>
+
+          <!-- Clean Monochrome Concentric Rings -->
+          <div class="my-4 relative flex items-center justify-center">
+            <svg class="w-52 h-52" viewBox="0 0 220 220">
+              <circle cx="110" cy="110" r="88" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5" />
+              <circle cx="110" cy="110" r="68" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5" />
+              <circle cx="110" cy="110" r="48" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5" />
+
+              <!-- Active Arcs in White, Silver, and Emerald -->
+              <circle id="helixArcOuter" cx="110" cy="110" r="88" fill="none" stroke="#f4f4f5" stroke-width="5" stroke-linecap="round" stroke-dasharray="480 552" transform="rotate(-90 110 110)" class="transition-all duration-500" />
+              <circle id="helixArcMid" cx="110" cy="110" r="68" fill="none" stroke="#a1a1aa" stroke-width="5" stroke-linecap="round" stroke-dasharray="360 427" transform="rotate(-90 110 110)" class="transition-all duration-500" />
+              <circle id="helixArcInner" cx="110" cy="110" r="48" fill="none" stroke="#10b981" stroke-width="5" stroke-linecap="round" stroke-dasharray="250 301" transform="rotate(-90 110 110)" class="transition-all duration-500" />
+
+              <circle cx="110" cy="110" r="28" fill="#090a0f" stroke="rgba(255,255,255,0.12)" stroke-width="1" />
+              <text id="radarScoreLabel" x="110" y="108" text-anchor="middle" fill="#ffffff" class="font-mono text-xs font-bold">93%</text>
+              <text id="radarQualityLabel" x="110" y="121" text-anchor="middle" fill="#a1a1aa" class="text-[9px]">ดีเยี่ยม (3)</text>
+            </svg>
+          </div>
+
+          <!-- Qualitative Pill Controls -->
+          <div class="space-y-2 bg-zinc-950/70 p-3.5 rounded-xl border border-zinc-800/80 text-xs">
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400">คุณลักษณะอันพึงประสงค์</span>
+              <div class="flex gap-1" id="rightTraitBtns"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400">อ่าน คิดวิเคราะห์ เขียน</span>
+              <div class="flex gap-1" id="rightReadBtns"></div>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400">สมรรถนะสำคัญ 5 ด้าน</span>
+              <div class="flex gap-1" id="rightCompBtns"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Bottom Summary Insight Box -->
+        <div class="mt-4 p-4 rounded-xl bg-zinc-950/90 border border-zinc-800">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-xs font-semibold text-white">สรุปสถานะรายบุคคล</span>
+            <span class="text-[10px] font-mono text-zinc-500">AUTO-EVAL</span>
+          </div>
+          <p id="aiInsightBox" class="text-[11px] text-zinc-400 leading-relaxed"></p>
+        </div>
+      </aside>
+
+    </div>
+  </div>
+
+  <!-- ================= OFFICIAL ปพ.5 BLUEPRINT MODAL ================= -->
+  <div id="blueprintModal" class="fixed inset-0 bg-black/85 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white text-slate-900 w-full max-w-6xl rounded-2xl shadow-2xl overflow-hidden max-h-[92vh] flex flex-col">
+      <div class="bg-zinc-950 text-white px-5 py-3.5 flex flex-wrap items-center justify-between gap-3 no-print">
+        <div>
+          <span class="text-[10px] font-mono text-zinc-400 uppercase">OFFICIAL OBEC ปพ.5 DOCUMENT</span>
+          <h3 class="text-sm font-bold">แบบรายงานผลการพัฒนาคุณภาพผู้เรียนรายบุคคล (ปพ.5)</h3>
+        </div>
+
+        <div class="flex flex-wrap gap-1 bg-zinc-900 p-1 rounded-xl text-xs border border-zinc-800">
+          <button onclick="switchPrintTab('cover')" id="ptab-cover" class="px-3 py-1.5 rounded-lg bg-white text-zinc-950 font-semibold">1. หน้าปก & สรุปผล</button>
+          <button onclick="switchPrintTab('attendance')" id="ptab-attendance" class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white">2. เวลาเรียน</button>
+          <button onclick="switchPrintTab('scores')" id="ptab-scores" class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white">3. คะแนน & เกรด</button>
+          <button onclick="switchPrintTab('qualitative')" id="ptab-qualitative" class="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white">4. คุณลักษณะฯ</button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button onclick="window.print()" class="px-4 py-2 rounded-xl bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs shadow-md">🖨️ พิมพ์ / บันทึก PDF</button>
+          <button onclick="closeBlueprintModal()" class="px-3 py-2 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs">✕ ปิด</button>
+        </div>
+      </div>
+
+      <!-- Printable Area -->
+      <div id="printableArea" class="p-6 overflow-y-auto space-y-5 text-xs text-slate-900"></div>
+    </div>
+  </div>
+
+  <!-- ================= APPLICATION LOGIC ================= -->
+  <script>
+    const STORAGE_KEY = 'porpor5_minimal_studio_v3';
+
+    const defaultStudents = [
+      {
+        id: '3101',
+        name: 'ด.ช. สายชล จันทร์เขียว',
+        avatar: '👦🏻',
+        attendancePct: 100,
+        weeks: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        formative: 33,
+        summative: 32,
+        midterm: 14,
+        final: 14,
+        worksSubmitted: 4,
+        trait: 3,
+        reading: 3,
+        competency: 3,
+        badges: ['🛡️', '🏅']
+      },
+      {
+        id: '3102',
+        name: 'ด.ช. ทู่ พม่า',
+        avatar: '👦🏽',
+        attendancePct: 95,
+        weeks: [1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        formative: 30,
+        summative: 29,
+        midterm: 13,
+        final: 13,
+        worksSubmitted: 4,
+        trait: 3,
+        reading: 3,
+        competency: 3,
+        badges: ['🌟']
+      },
+      {
+        id: '3103',
+        name: 'ด.ช. ติณณสิรภพ ชูศิริ',
+        avatar: '👦🏻',
+        attendancePct: 100,
+        weeks: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        formative: 34,
+        summative: 33,
+        midterm: 15,
+        final: 14,
+        worksSubmitted: 4,
+        trait: 3,
+        reading: 3,
+        competency: 3,
+        badges: ['🏅', '👑']
+      },
+      {
+        id: '3104',
+        name: 'ด.ญ. กณิศา เย็นนพคุณ',
+        avatar: '👧🏻',
+        attendancePct: 98,
+        weeks: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2],
+        formative: 32,
+        summative: 31,
+        midterm: 14,
+        final: 13,
+        worksSubmitted: 4,
+        trait: 3,
+        reading: 3,
+        competency: 3,
+        badges: ['🛡️', '🌟']
+      },
+      {
+        id: '3105',
+        name: 'ด.ญ. พิชญาภัค สีแดงยิ่ง',
+        avatar: '👧🏻',
+        attendancePct: 95,
+        weeks: [1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1],
+        formative: 31,
+        summative: 30,
+        midterm: 13,
+        final: 13,
+        worksSubmitted: 4,
+        trait: 3,
+        reading: 3,
+        competency: 3,
+        badges: ['🏅']
+      },
+      {
+        id: '3106',
+        name: 'ด.ญ. กานดา พม่า',
+        avatar: '👧🏽',
+        attendancePct: 90,
+        weeks: [1,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1],
+        formative: 27,
+        summative: 25,
+        midterm: 11,
+        final: 12,
+        worksSubmitted: 3,
+        trait: 2,
+        reading: 2,
+        competency: 2,
+        badges: ['🛡️']
+      },
+      {
+        id: '3107',
+        name: 'ด.ญ. อิโม พม่า',
+        avatar: '👧🏽',
+        attendancePct: 85,
+        weeks: [1,0,1,1,2,1,1,0,1,1,1,2,1,1,1,1,1,1,1,1],
+        formative: 24,
+        summative: 22,
+        midterm: 10,
+        final: 11,
+        worksSubmitted: 3,
+        trait: 2,
+        reading: 2,
+        competency: 2,
+        badges: ['⚡']
+      },
+      {
+        id: '3108',
+        name: 'ด.ญ. แป้ง',
+        avatar: '👧🏻',
+        attendancePct: 92,
+        weeks: [1,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1],
+        formative: 28,
+        summative: 26,
+        midterm: 12,
+        final: 12,
+        worksSubmitted: 3,
+        trait: 3,
+        reading: 2,
+        competency: 2,
+        badges: ['🌸']
+      }
+    ];
+
+    const p4Students = [
+      { id: '4101', name: 'ด.ช. พิชญะ รักชาติ', avatar: '👦🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 33, summative: 32, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🛡️', '🏅'] },
+      { id: '4102', name: 'ด.ช. กฤษติพัฒน์ สุวรรณมาโจ', avatar: '👦🏽', attendancePct: 95, weeks: [1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], formative: 31, summative: 30, midterm: 13, final: 13, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌟'] },
+      { id: '4103', name: 'ด.ช. พนัชกร ทองอ่อน', avatar: '👦🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 34, summative: 33, midterm: 15, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['👑'] },
+      { id: '4104', name: 'ด.ช. ธนดล รอดคืน', avatar: '👦🏽', attendancePct: 95, weeks: [1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], formative: 29, summative: 28, midterm: 12, final: 13, worksSubmitted: 4, trait: 3, reading: 2, competency: 3, badges: ['🛡️'] },
+      { id: '4105', name: 'ด.ช. เอา พม่า', avatar: '👦🏽', attendancePct: 90, weeks: [1,1,1,1,2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1], formative: 28, summative: 26, midterm: 12, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+      { id: '4106', name: 'ด.ช. ธนวัฒน์ ชูทับ', avatar: '👦🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 33, summative: 32, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🏅'] },
+      { id: '4107', name: 'ด.ช. ดนัย พม่า', avatar: '👦🏽', attendancePct: 90, weeks: [1,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1], formative: 27, summative: 25, midterm: 11, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['🛡️'] },
+      { id: '4108', name: 'ด.ช. ซอ พม่า', avatar: '👦🏽', attendancePct: 85, weeks: [1,0,1,1,2,1,1,0,1,1,1,2,1,1,1,1,1,1,1,1], formative: 24, summative: 22, midterm: 10, final: 11, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+      { id: '4109', name: 'ด.ญ. ปุณยนุช หอมหวล', avatar: '👧🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 35, summative: 34, midterm: 15, final: 15, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌸', '👑'] },
+      { id: '4110', name: 'ด.ญ. เมษา พม่า', avatar: '👧🏽', attendancePct: 95, weeks: [1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], formative: 30, summative: 29, midterm: 13, final: 13, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌟'] },
+      { id: '4111', name: 'ด.ญ. ดอกแก้ว ศรีจราพร', avatar: '👧🏻', attendancePct: 98, weeks: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2], formative: 32, summative: 31, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌸'] },
+      { id: '4112', name: 'ด.ญ. ตอดาวาว พม่า', avatar: '👧🏽', attendancePct: 88, weeks: [1,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1], formative: 26, summative: 24, midterm: 11, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+      { id: '4113', name: 'ด.ญ. โนรี พม่า', avatar: '👧🏽', attendancePct: 90, weeks: [1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], formative: 28, summative: 27, midterm: 12, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['🌟'] },
+      { id: '4114', name: 'ด.ญ. ณิชาพัชร์ ทองนุ่น', avatar: '👧🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 34, summative: 33, midterm: 15, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🛡️', '👑'] },
+    ];
+
+    const p5Students = [
+      { id: '5101', name: 'ด.ช. กัญฑ์ณภัทร พิบูลย์', avatar: '👦🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 33, summative: 32, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🛡️', '🏅'] },
+      { id: '5102', name: 'ด.ช. คริษฐ (พม่า) ศรีจราพร', avatar: '👦🏽', attendancePct: 90, weeks: [1,1,1,1,2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1], formative: 28, summative: 27, midterm: 12, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+      { id: '5103', name: 'ด.ช. โก (พม่า) ศรีจราพร', avatar: '👦🏽', attendancePct: 85, weeks: [1,0,1,1,2,1,1,0,1,1,1,2,1,1,1,1,1,1,1,1], formative: 25, summative: 24, midterm: 11, final: 11, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+      { id: '5104', name: 'ด.ช. ชาย ศรีจราพร', avatar: '👦🏻', attendancePct: 95, weeks: [1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], formative: 31, summative: 30, midterm: 13, final: 13, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌟'] },
+      { id: '5105', name: 'ด.ญ. กัญญารัตน์ ชูทับ', avatar: '👧🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 35, summative: 34, midterm: 15, final: 15, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌸', '👑'] },
+      { id: '5106', name: 'ด.ญ. ธนภรณ์ วงศ์สวัสดิ์', avatar: '👧🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 34, summative: 33, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🏅', '🌸'] },
+      { id: '5107', name: 'ด.ญ. ปภัสรา นุ่มนวล', avatar: '👧🏻', attendancePct: 98, weeks: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2], formative: 32, summative: 31, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌟'] },
+      { id: '5108', name: 'ด.ญ. ดอกไม้ ศรีจราพร', avatar: '👧🏽', attendancePct: 88, weeks: [1,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1], formative: 27, summative: 25, midterm: 12, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+      { id: '5109', name: 'ด.ญ. อลิสา ศรีจราพร', avatar: '👧🏽', attendancePct: 92, weeks: [1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], formative: 29, summative: 28, midterm: 13, final: 12, worksSubmitted: 4, trait: 3, reading: 2, competency: 3, badges: ['🌟'] },
+    ];
+
+    const p6Students = [
+      { id: '10001', name: 'ด.ช. ปัณณวัฒน์ ชูเมือง', avatar: '👦🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 34, summative: 33, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🛡️', '👑'] },
+      { id: '10002', name: 'ด.ช. สันติสุข เสนสรสัง', avatar: '👦🏻', attendancePct: 95, weeks: [1,1,2,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1], formative: 31, summative: 30, midterm: 13, final: 13, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌟'] },
+      { id: '10003', name: 'ด.ช. กิตตินัน นาคแก้ว', avatar: '👦🏻', attendancePct: 98, weeks: [1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2], formative: 32, summative: 31, midterm: 14, final: 14, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🏅'] },
+      { id: '10004', name: 'ด.ช. กฤษณพล พัฒนศิลป์', avatar: '👦🏽', attendancePct: 90, weeks: [1,1,1,1,2,1,1,1,1,1,1,2,1,1,1,1,1,1,1,1], formative: 28, summative: 27, midterm: 12, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+      { id: '10005', name: 'ด.ญ. นันทกานต์ สันทวงศ์', avatar: '👧🏻', attendancePct: 100, weeks: Array(20).fill(1), formative: 35, summative: 34, midterm: 15, final: 15, worksSubmitted: 4, trait: 3, reading: 3, competency: 3, badges: ['🌸', '👑'] },
+      { id: '10006', name: 'ด.ญ. น้อง พม่า', avatar: '👧🏽', attendancePct: 88, weeks: [1,1,2,1,1,1,1,2,1,1,1,1,1,1,1,1,1,1,1,1], formative: 27, summative: 25, midterm: 12, final: 12, worksSubmitted: 3, trait: 2, reading: 2, competency: 2, badges: ['⚡'] },
+    ];
+
+    let currentCourse = 'sub_soc_13101';
+    function getRosterForCourse(cid) {
+      if (cid.includes('14101') || cid.includes('14102')) return p4Students;
+      if (cid.includes('15101') || cid.includes('15901')) return p5Students;
+      if (cid.includes('16101')) return p6Students;
+      return defaultStudents;
+    }
+
+    let students = JSON.parse(localStorage.getItem(STORAGE_KEY)) || JSON.parse(JSON.stringify(defaultStudents));
+    let activeStudentIdx = 0;
+    let currentModule = 'cosmic';
+    let currentPrintTab = 'cover';
+    let currentOrbitDate = new Date().toISOString().split('T')[0];
+
+    function formatOrbitThaiDate(dStr) {
+      if (!dStr) return '';
+      try {
+        const [y, m, d] = dStr.split('-').map(Number);
+        const dt = new Date(y, m - 1, d);
+        const days = ['อาทิตย์', 'จันทร์', 'อังคาร', 'พุธ', 'พฤหัสบดี', 'ศุกร์', 'เสาร์'];
+        const months = ['ม.ค.', 'ก.พ.', 'มี.ค.', 'เม.ย.', 'พ.ค.', 'มิ.ย.', 'ก.ค.', 'ส.ค.', 'ก.ย.', 'ต.ค.', 'พ.ย.', 'ธ.ค.'];
+        return `วัน${days[dt.getDay()]}ที่ ${d} ${months[m - 1]} ${y + 543}`;
+      } catch {
+        return dStr;
+      }
+    }
+
+    function onOrbitDateChange(val) {
+      if (!val) return;
+      currentOrbitDate = val;
+      renderAll();
+    }
+
+    function shiftOrbitDate(days) {
+      const [y, m, d] = currentOrbitDate.split('-').map(Number);
+      const dt = new Date(y, m - 1, d);
+      dt.setDate(dt.getDate() + days);
+      currentOrbitDate = dt.toISOString().split('T')[0];
+      const inp = document.getElementById('orbitDateInput');
+      if (inp) inp.value = currentOrbitDate;
+      renderAll();
+    }
+
+    function setOrbitDateToday() {
+      currentOrbitDate = new Date().toISOString().split('T')[0];
+      const inp = document.getElementById('orbitDateInput');
+      if (inp) inp.value = currentOrbitDate;
+      renderAll();
+    }
+
+    function setDailyAttendance(sIdx, status) {
+      if (!students[sIdx].daily) students[sIdx].daily = {};
+      students[sIdx].daily[currentOrbitDate] = status;
+      const recorded = Object.values(students[sIdx].daily);
+      const attended = recorded.filter(v => v !== 0).length;
+      students[sIdx].attendancePct = Math.round((attended / Math.max(1, recorded.length)) * 100);
+      saveState();
+      renderAll();
+    }
+
+    function saveState() {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(students));
+      const tracker = document.getElementById('syncTracker');
+      tracker.innerText = 'SAVING CHANGES...';
+      setTimeout(() => { tracker.innerText = 'LOCAL-FIRST SYNCED'; }, 300);
+    }
+
+    function resetDemoData() {
+      localStorage.removeItem(STORAGE_KEY);
+      students = JSON.parse(JSON.stringify(defaultStudents));
+      activeStudentIdx = 0;
+      renderAll();
+    }
+
+    function getTotalScore(s) {
+      return (Number(s.formative) || 0) + (Number(s.summative) || 0) + (Number(s.midterm) || 0) + (Number(s.final) || 0);
+    }
+
+    function getOfficialGrade(s) {
+      if (s.attendancePct < 80) return 'มส';
+      if (s.worksSubmitted < 2) return 'ร';
+      const total = getTotalScore(s);
+      if (total >= 80) return '4';
+      if (total >= 75) return '3.5';
+      if (total >= 70) return '3';
+      if (total >= 65) return '2.5';
+      if (total >= 60) return '2';
+      if (total >= 55) return '1.5';
+      if (total >= 50) return '1';
+      return '0';
+    }
+
+    function needsRetrofit(s) {
+      return s.summative < 18 || s.attendancePct < 80 || getTotalScore(s) < 50 || s.worksSubmitted < 2;
+    }
+
+    function switchModule(mod) {
+      currentModule = mod;
+      ['cosmic', 'helix', 'orbit', 'vibe', 'retrofit'].forEach(m => {
+        document.getElementById('mod-' + m).classList.toggle('hidden', m !== mod);
+        document.getElementById('nav-' + m).classList.toggle('active', m === mod);
+      });
+
+      const titles = {
+        cosmic: ['SPATIAL NODE INSPECTOR & GRADE LINKAGE', 'โครงข่ายข้อมูลผู้เรียนรายบุคคล (คลิกเลือกการ์ดเพื่อปรับคะแนนและดูความเชื่อมโยง)'],
+        helix: ['INDICATOR HELIX — SCORE MATRIX', 'ตารางวิถีคะแนนรายหน่วย (ระหว่างทาง 35 / ปลายทาง 35 / กลางปี 15 / ปลายปี 15)'],
+        orbit: ['ATTENDANCE ORBIT — TIME MATRIX', 'ระบบเช็คชื่อและสถิติเวลาเรียน (คำนวณสิทธิ์สอบ 80% อัตโนมัติ)'],
+        vibe: ['QUALITATIVE EVALUATION MATRIX', 'ประเมินคุณลักษณะอันพึงประสงค์ 8 ข้อ, อ่าน คิดวิเคราะห์ เขียน และสมรรถนะ 5 ด้าน'],
+        retrofit: ['REMEDIAL TRACKER — RECOVERY HUB', 'ศูนย์ติดตามงานค้างและซ่อมเสริมตัวชี้วัดปลายทาง']
+      };
+      document.getElementById('moduleSubHeader').innerText = titles[mod][0];
+      document.getElementById('moduleMainTitle').innerText = titles[mod][1];
+      renderAll();
+    }
+
+    function selectStudent(idx) {
+      activeStudentIdx = idx;
+      renderAll();
+    }
+
+    function updateFromHolo(field, val) {
+      const s = students[activeStudentIdx];
+      s[field] = parseInt(val, 10) || 0;
+      autoAdjustQualitative(s);
+      saveState();
+      renderAll();
+    }
+
+    function rotateKnob(type) {
+      const s = students[activeStudentIdx];
+      s[type] = (s[type] + 1) > 15 ? 8 : (s[type] + 1);
+      autoAdjustQualitative(s);
+      saveState();
+      renderAll();
+    }
+
+    function autoAdjustQualitative(s) {
+      const total = getTotalScore(s);
+      if (s.attendancePct >= 90 && total >= 75) {
+        s.trait = 3; s.reading = 3; s.competency = 3;
+      } else if (total >= 55) {
+        s.trait = 2; s.reading = 2; s.competency = 2;
+      } else {
+        s.trait = 1; s.reading = 1; s.competency = 1;
+      }
+    }
+
+    function renderAll() {
+      const s = students[activeStudentIdx];
+      const total = getTotalScore(s);
+      const grade = getOfficialGrade(s);
+      const isAlert = needsRetrofit(s);
+
+      const avgTotal = Math.round(students.reduce((a, b) => a + getTotalScore(b), 0) / students.length);
+      const avgAtt = Math.round(students.reduce((a, b) => a + b.attendancePct, 0) / students.length);
+      const retrofitCount = students.filter(needsRetrofit).length;
+
+      document.getElementById('gaugeCompletenessVal').innerText = avgTotal + '%';
+      document.getElementById('gaugeCompletenessArc').setAttribute('stroke-dasharray', `${avgTotal}, 100`);
+      document.getElementById('gaugeAttendanceVal').innerText = avgAtt + '%';
+      document.getElementById('gaugeAttendanceArc').setAttribute('stroke-dasharray', `${avgAtt}, 100`);
+      document.getElementById('sidebarRetrofitBadge').innerText = retrofitCount;
+
+      document.getElementById('holoAvatar').innerHTML = `<div class="w-full h-full flex items-center justify-center">${s.avatar}</div>`;
+      document.getElementById('holoName').innerText = s.name;
+      document.getElementById('holoCode').innerText = `NO. ${s.id}`;
+      document.getElementById('knobMidVal').innerText = s.midterm;
+      document.getElementById('knobFinVal').innerText = s.final;
+
+      const midAngle = Math.round(((s.midterm / 15) * 240) - 120);
+      const finAngle = Math.round(((s.final / 15) * 240) - 120);
+      document.getElementById('knobMidterm').style.transform = `rotate(${midAngle}deg)`;
+      document.getElementById('knobFinal').style.transform = `rotate(${finAngle}deg)`;
+
+      document.getElementById('holoPassBadge').innerHTML = `${total} <span class="text-xs text-zinc-500">/100</span>`;
+
+      const gradePill = document.getElementById('holoGradePill');
+      gradePill.innerText = 'เกรด ' + grade;
+      gradePill.className = isAlert
+        ? 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-rose-500/15 text-rose-400 border border-rose-500/30'
+        : 'text-[11px] font-semibold px-2 py-0.5 rounded-md bg-emerald-500/15 text-emerald-400 border border-emerald-500/30';
+
+      document.getElementById('holoFormativeText').innerText = s.formative;
+      document.getElementById('holoFormativeSlider').value = s.formative;
+      document.getElementById('holoSummativeText').innerText = s.summative;
+      document.getElementById('holoSummativeSlider').value = s.summative;
+
+      const sumStat = document.getElementById('holoSummativeStatus');
+      if (s.summative < 18) {
+        sumStat.innerText = '⚠️ ต่ำกว่าเกณฑ์ปลายทาง (ต้องซ่อม)';
+        sumStat.className = 'text-amber-400 font-medium';
+      } else {
+        sumStat.innerText = '✓ ผ่านเกณฑ์ปลายทาง';
+        sumStat.className = 'text-emerald-400 font-medium';
+      }
+
+      // Render Connected Student Cards
+      const nodesContainer = document.getElementById('constellationNodesList');
+      nodesContainer.innerHTML = students.map((st, idx) => {
+        const stTotal = getTotalScore(st);
+        const stGrade = getOfficialGrade(st);
+
+        return `
+          <div onclick="selectStudent(${idx})" class="glass-card ${idx === activeStudentIdx ? 'selected' : ''} rounded-xl p-3.5 cursor-pointer">
+            <div class="flex items-center justify-between gap-2">
+              <div class="flex items-center gap-3">
+                <div class="w-9 h-9 rounded-lg bg-zinc-800 border border-zinc-700 flex items-center justify-center text-lg">${st.avatar}</div>
+                <div>
+                  <div class="text-xs font-semibold text-white">${st.name}</div>
+                  <div class="text-[10px] font-mono text-zinc-400">NO. ${st.id} • รวม ${stTotal} คะแนน (เกรด ${stGrade})</div>
+                </div>
+              </div>
+              <span class="font-mono text-xs text-zinc-500">${st.id}</span>
+            </div>
+
+            <div class="mt-2.5 flex items-center justify-between pt-2 border-t border-zinc-800/80 text-[11px]">
+              <div class="flex items-center gap-2">
+                <span class="font-mono text-zinc-400">เวลาเรียน <strong class="text-zinc-200">${st.attendancePct}%</strong></span>
+                <span class="text-zinc-600">•</span>
+                <span class="text-zinc-400">ส่งงาน <strong class="text-zinc-200">${st.worksSubmitted}/4</strong></span>
+              </div>
+              <div class="text-sm">${st.badges.join(' ')}</div>
+            </div>
+          </div>
+        `;
+      }).join('');
+
+      // Helix Table
+      document.getElementById('helixTableBody').innerHTML = students.map((st, idx) => `
+        <tr onclick="selectStudent(${idx})" class="hover:bg-zinc-800/40 cursor-pointer ${idx === activeStudentIdx ? 'bg-zinc-800/60' : ''}">
+          <td class="p-3 font-mono text-zinc-400">${st.id}</td>
+          <td class="p-3 font-medium text-white">${st.avatar} ${st.name}</td>
+          <td class="p-2.5 text-center">
+            <input type="number" min="0" max="35" value="${st.formative}" onchange="updateTableScore(${idx}, 'formative', this.value)" class="w-14 bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-center font-mono text-zinc-200"/>
+          </td>
+          <td class="p-2.5 text-center">
+            <input type="number" min="0" max="35" value="${st.summative}" onchange="updateTableScore(${idx}, 'summative', this.value)" class="w-14 bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-center font-mono text-zinc-200"/>
+          </td>
+          <td class="p-2.5 text-center">
+            <input type="number" min="0" max="15" value="${st.midterm}" onchange="updateTableScore(${idx}, 'midterm', this.value)" class="w-12 bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-center font-mono text-zinc-200"/>
+          </td>
+          <td class="p-2.5 text-center">
+            <input type="number" min="0" max="15" value="${st.final}" onchange="updateTableScore(${idx}, 'final', this.value)" class="w-12 bg-zinc-900 border border-zinc-700 rounded px-2 py-1 text-center font-mono text-zinc-200"/>
+          </td>
+          <td class="p-3 text-center font-mono font-bold text-white">${getTotalScore(st)}</td>
+          <td class="p-3 text-center font-mono font-bold text-zinc-300">${getOfficialGrade(st)}</td>
+        </tr>
+      `).join('');
+
+      // Attendance Orbit with Date Support
+      const orbitInput = document.getElementById('orbitDateInput');
+      if (orbitInput && !orbitInput.value) orbitInput.value = currentOrbitDate;
+      const orbitLabel = document.getElementById('orbitThaiDateLabel');
+      if (orbitLabel) orbitLabel.innerText = `(${formatOrbitThaiDate(currentOrbitDate)})`;
+
+      document.getElementById('orbitAttendanceContainer').innerHTML = students.map((st, sIdx) => {
+        if (!st.daily) st.daily = {};
+        const dayStatus = st.daily[currentOrbitDate] !== undefined ? st.daily[currentOrbitDate] : 1;
+        return `
+        <div class="p-3 rounded-xl bg-zinc-950/70 border border-zinc-800/80 flex flex-wrap items-center justify-between gap-3">
+          <div class="w-48 flex items-center gap-2.5">
+            <span class="text-base">${st.avatar}</span>
+            <div>
+              <div class="text-xs font-semibold text-white">${st.name}</div>
+              <div class="text-[10px] font-mono ${st.attendancePct < 80 ? 'text-rose-400' : 'text-zinc-400'}">เวลาเรียนสะสม: ${st.attendancePct}%</div>
+            </div>
+          </div>
+
+          <!-- วันที่เลือก: เช็ก มา / ลา / ขาด -->
+          <div class="flex items-center gap-1 bg-zinc-900 px-2 py-1 rounded-xl border border-zinc-800">
+            <span class="text-[10px] text-zinc-500 mr-1 hidden sm:inline">วันที่เลือก:</span>
+            <button onclick="setDailyAttendance(${sIdx}, 1)" class="px-2 py-0.5 rounded text-[11px] font-bold transition ${dayStatus === 1 ? 'bg-zinc-200 text-zinc-950 shadow' : 'text-zinc-400 hover:text-white'}">/ มา</button>
+            <button onclick="setDailyAttendance(${sIdx}, 2)" class="px-2 py-0.5 rounded text-[11px] font-bold transition ${dayStatus === 2 ? 'bg-amber-400 text-zinc-950 shadow' : 'text-zinc-400 hover:text-white'}">ล ลา</button>
+            <button onclick="setDailyAttendance(${sIdx}, 0)" class="px-2 py-0.5 rounded text-[11px] font-bold transition ${dayStatus === 0 ? 'bg-rose-500 text-white shadow' : 'text-zinc-400 hover:text-white'}">ข ขาด</button>
+          </div>
+
+          <!-- ไทม์ไลน์ 20 สัปดาห์ -->
+          <div class="flex flex-wrap gap-1 items-center">
+            <span class="text-[10px] text-zinc-500 mr-1 hidden md:inline">20 สัปดาห์:</span>
+            ${st.weeks.map((w, wIdx) => {
+              const bg = w === 1 ? 'bg-zinc-200 text-zinc-950' : (w === 2 ? 'bg-amber-400 text-zinc-950' : 'bg-rose-500 text-white');
+              const label = w === 1 ? '/' : (w === 2 ? 'ล' : 'ข');
+              return `<button onclick="toggleWeekAttendance(${sIdx},${wIdx})" class="w-5 h-5 rounded text-[10px] font-mono font-bold ${bg} flex items-center justify-center">${label}</button>`;
+            }).join('')}
+          </div>
+        </div>
+      `}).join('');
+
+      // Vibe Matrix
+      document.getElementById('vibeTableBody').innerHTML = students.map((st, idx) => `
+        <tr onclick="selectStudent(${idx})" class="hover:bg-zinc-800/40 cursor-pointer">
+          <td class="p-3 font-medium text-white">${st.avatar} ${st.name}</td>
+          <td class="p-2.5 text-center font-mono text-zinc-400">${st.trait}, ${st.trait}, ${st.trait}, ${st.trait}</td>
+          <td class="p-2.5 text-center font-mono text-zinc-400">${st.trait}, ${st.trait}, ${st.trait}, ${st.trait}</td>
+          <td class="p-2.5 text-center">
+            <button onclick="event.stopPropagation(); cycleQual(${idx}, 'trait')" class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-200 font-semibold text-xs">ระดับ ${st.trait}</button>
+          </td>
+          <td class="p-2.5 text-center">
+            <button onclick="event.stopPropagation(); cycleQual(${idx}, 'reading')" class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-200 font-semibold text-xs">ระดับ ${st.reading}</button>
+          </td>
+          <td class="p-2.5 text-center">
+            <button onclick="event.stopPropagation(); cycleQual(${idx}, 'competency')" class="px-2 py-0.5 rounded bg-zinc-800 border border-zinc-700 text-zinc-200 font-semibold text-xs">ระดับ ${st.competency}</button>
+          </td>
+        </tr>
+      `).join('');
+
+      // Remedial
+      const retrofitStudents = students.map((st, idx) => ({ ...st, idx })).filter(needsRetrofit);
+      const retroContainer = document.getElementById('retrofitListContainer');
+      if (retrofitStudents.length === 0) {
+        retroContainer.innerHTML = `
+          <div class="p-8 text-center rounded-xl bg-zinc-950/40 border border-zinc-800">
+            <div class="text-sm font-semibold text-zinc-300">นักเรียนทุกคนผ่านเกณฑ์ตัวชี้วัดปลายทางและเวลาเรียนครบ 80%</div>
+          </div>
+        `;
+      } else {
+        retroContainer.innerHTML = retrofitStudents.map(st => `
+          <div class="p-4 rounded-xl bg-zinc-950/80 border border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+            <div class="flex items-center gap-3">
+              <span class="text-xl">${st.avatar}</span>
+              <div>
+                <div class="text-xs font-semibold text-white">${st.name}</div>
+                <div class="text-[11px] text-zinc-400 mt-0.5">
+                  ${st.summative < 18 ? `คะแนนปลายทาง ${st.summative}/35 (เกณฑ์ผ่าน 18)` : ''} 
+                  ${st.attendancePct < 80 ? `• เวลาเรียน ${st.attendancePct}% (<80%)` : ''}
+                </div>
+              </div>
+            </div>
+            <button onclick="approveRetrofit(${st.idx})" class="px-3.5 py-1.5 rounded-lg bg-zinc-100 hover:bg-white text-zinc-950 font-semibold text-xs transition">
+              บันทึกผลซ่อมเสริม
+            </button>
+          </div>
+        `).join('');
+      }
+
+      // Right Radar
+      const arcOuter = Math.round((total / 100) * 552);
+      const arcMid = Math.round((s.trait / 3) * 427);
+      const arcInner = Math.round((s.reading / 3) * 301);
+      document.getElementById('helixArcOuter').setAttribute('stroke-dasharray', `${arcOuter} 552`);
+      document.getElementById('helixArcMid').setAttribute('stroke-dasharray', `${arcMid} 427`);
+      document.getElementById('helixArcInner').setAttribute('stroke-dasharray', `${arcInner} 301`);
+      document.getElementById('radarScoreLabel').textContent = `${total}%`;
+      const qNames = ['ไม่ผ่าน (0)', 'ผ่าน (1)', 'ดี (2)', 'ดีเยี่ยม (3)'];
+      document.getElementById('radarQualityLabel').textContent = qNames[s.trait];
+
+      renderRightQualButtons('rightTraitBtns', 'trait', s.trait);
+      renderRightQualButtons('rightReadBtns', 'reading', s.reading);
+      renderRightQualButtons('rightCompBtns', 'competency', s.competency);
+
+      const aiBox = document.getElementById('aiInsightBox');
+      if (isAlert) {
+        aiBox.innerHTML = `${s.name} ยังไม่ผ่านเกณฑ์ตัวชี้วัดปลายทาง (${s.summative}/35) แนะนำให้ติดตามในเมนูงานค้าง & ซ่อมเสริม`;
+      } else {
+        aiBox.innerHTML = `${s.name} มีผลการเรียนระดับเกรด ${grade} (คะแนนรวม ${total}/100) เวลาเรียน ${s.attendancePct}% ข้อมูลสอดคล้องตามเกณฑ์ สพฐ. 100%`;
+      }
+    }
+
+    function renderRightQualButtons(containerId, field, currentVal) {
+      document.getElementById(containerId).innerHTML = [3, 2, 1].map(lvl => `
+        <button onclick="setRightQual('${field}', ${lvl})" class="w-6 h-6 rounded text-[11px] font-mono font-semibold transition ${currentVal === lvl ? 'bg-white text-zinc-950' : 'bg-zinc-800 text-zinc-400 hover:bg-zinc-700'}">${lvl}</button>
+      `).join('');
+    }
+
+    function setRightQual(field, lvl) {
+      students[activeStudentIdx][field] = lvl;
+      saveState();
+      renderAll();
+    }
+
+    function updateTableScore(idx, field, val) {
+      students[idx][field] = Math.max(0, parseInt(val, 10) || 0);
+      autoAdjustQualitative(students[idx]);
+      saveState();
+      renderAll();
+    }
+
+    function bonusAllStudents(pts) {
+      students.forEach(s => { s.formative = Math.min(35, s.formative + pts); });
+      saveState();
+      renderAll();
+    }
+
+    function toggleWeekAttendance(sIdx, wIdx) {
+      const curr = students[sIdx].weeks[wIdx];
+      students[sIdx].weeks[wIdx] = curr === 1 ? 2 : (curr === 2 ? 0 : 1);
+      const presentCount = students[sIdx].weeks.filter(w => w !== 0).length;
+      students[sIdx].attendancePct = Math.round((presentCount / 20) * 100);
+      saveState();
+      renderAll();
+    }
+
+    function setAllAttendance100() {
+      students.forEach(s => {
+        s.weeks = s.weeks.map(() => 1);
+        s.attendancePct = 100;
+      });
+      saveState();
+      renderAll();
+    }
+
+    function cycleQual(idx, field) {
+      students[idx][field] = students[idx][field] === 3 ? 2 : (students[idx][field] === 2 ? 1 : 3);
+      saveState();
+      renderAll();
+    }
+
+    function syncVibeFromScores() {
+      students.forEach(autoAdjustQualitative);
+      saveState();
+      renderAll();
+    }
+
+    function approveRetrofit(idx) {
+      const s = students[idx];
+      if (s.summative < 18) s.summative = 20;
+      if (s.attendancePct < 80) s.attendancePct = 82;
+      autoAdjustQualitative(s);
+      saveState();
+      renderAll();
+    }
+
+    function addNewStudentModal() {
+      const name = prompt('กรอกชื่อ-นามสกุลนักเรียนใหม่:', 'ด.ช. ธีรภัทร ยอดเยี่ยม');
+      if (!name) return;
+      const nextId = String(students.length + 1).padStart(3, '0');
+      students.push({
+        id: nextId,
+        name,
+        avatar: '👦🏻',
+        attendancePct: 100,
+        weeks: Array(20).fill(1),
+        formative: 30,
+        summative: 28,
+        midterm: 13,
+        final: 13,
+        worksSubmitted: 4,
+        trait: 3,
+        reading: 3,
+        competency: 3,
+        badges: ['🛡️']
+      });
+      activeStudentIdx = students.length - 1;
+      saveState();
+      renderAll();
+    }
+
+    function openBlueprintModal() {
+      document.getElementById('blueprintModal').classList.remove('hidden');
+      switchPrintTab(currentPrintTab);
+    }
+
+    function closeBlueprintModal() {
+      document.getElementById('blueprintModal').classList.add('hidden');
+    }
+
+    function switchPrintTab(tab) {
+      currentPrintTab = tab;
+      ['cover', 'attendance', 'scores', 'qualitative'].forEach(t => {
+        const btn = document.getElementById('ptab-' + t);
+        btn.className = t === tab
+          ? 'px-3 py-1.5 rounded-lg bg-white text-zinc-950 font-semibold'
+          : 'px-3 py-1.5 rounded-lg text-zinc-400 hover:text-white';
+      });
+
+      const courseText = document.getElementById('courseSelect').options[document.getElementById('courseSelect').selectedIndex].text;
+      const area = document.getElementById('printableArea');
+
+      if (tab === 'cover') {
+        const gradeLabels = ['4', '3.5', '3', '2.5', '2', '1.5', '1', '0', 'ร', 'มส'];
+        const counts = {};
+        gradeLabels.forEach(g => counts[g] = 0);
+        students.forEach(s => { counts[getOfficialGrade(s)] = (counts[getOfficialGrade(s)] || 0) + 1; });
+
+        area.innerHTML = `
+          <div class="text-center border-b-2 border-slate-900 pb-4">
+            <h2 class="text-lg font-bold">แบบรายงานผลการพัฒนาคุณภาพผู้เรียนรายบุคคล (ปพ.5)</h2>
+            <p class="text-sm font-semibold mt-1">โรงเรียนบ้านควนเนียง สำนักงานเขตพื้นที่การศึกษาประถมศึกษาสุราษฎร์ธานี เขต 3</p>
+            <p class="text-xs mt-1">${courseText} | ปีการศึกษา 2569 | ครูผู้สอน: นายพิชญุตม์ ประภาศิริ</p>
+          </div>
+
+          <div class="mt-4">
+            <h4 class="font-bold text-sm mb-2">1. ตารางสรุปจำนวนและร้อยละของระดับผลการเรียน</h4>
+            <table class="w-full border-collapse border border-slate-500 text-center">
+              <thead class="bg-slate-100">
+                <tr>
+                  ${gradeLabels.map(g => `<th class="border border-slate-500 p-2">เกรด ${g}</th>`).join('')}
+                  <th class="border border-slate-500 p-2 bg-slate-200">รวม</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  ${gradeLabels.map(g => `<td class="border border-slate-500 p-2 font-bold text-sm">${counts[g]} คน</td>`).join('')}
+                  <td class="border border-slate-500 p-2 font-bold text-sm bg-slate-100">${students.length} คน</td>
+                </tr>
+                <tr>
+                  ${gradeLabels.map(g => `<td class="border border-slate-500 p-1.5 text-slate-600">${((counts[g]/students.length)*100).toFixed(1)}%</td>`).join('')}
+                  <td class="border border-slate-500 p-1.5 font-bold">100.0%</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="grid grid-cols-2 gap-6 mt-8 pt-6 border-t border-slate-300 text-center">
+            <div class="space-y-6">
+              <div>ลงชื่อ........................................................ครูผู้สอน<br/>( นายพิชญุตม์ ประภาศิริ )</div>
+              <div>ลงชื่อ........................................................หัวหน้ากลุ่มสาระฯ<br/>( ........................................................ )</div>
+            </div>
+            <div class="space-y-6">
+              <div>ลงชื่อ........................................................หัวหน้างานวัดผล<br/>( ........................................................ )</div>
+              <div><strong>อนุมัติผลการเรียน</strong><br/>ลงชื่อ........................................................ผู้อำนวยการโรงเรียน</div>
+            </div>
+          </div>
+        `;
+      } else if (tab === 'attendance') {
+        area.innerHTML = `
+          <h3 class="text-sm font-bold mb-2">ส่วนที่ 2: บันทึกเวลาเรียนตลอดปีการศึกษา (${courseText})</h3>
+          <table class="w-full border-collapse border border-slate-500 text-center">
+            <thead class="bg-slate-100">
+              <tr>
+                <th class="border border-slate-500 p-1.5">เลขที่</th>
+                <th class="border border-slate-500 p-1.5 text-left">ชื่อ - ชื่อสกุล</th>
+                ${Array.from({length: 20}, (_, i) => `<th class="border border-slate-500 p-1 text-[10px]">ส.${i+1}</th>`).join('')}
+                <th class="border border-slate-500 p-1.5">ร้อยละ</th>
+                <th class="border border-slate-500 p-1.5">สิทธิ์สอบ</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map((s, i) => `
+                <tr>
+                  <td class="border border-slate-500 p-1.5">${i+1}</td>
+                  <td class="border border-slate-500 p-1.5 text-left">${s.name}</td>
+                  ${s.weeks.map(w => `<td class="border border-slate-500 p-1">${w === 1 ? '/' : (w === 2 ? 'ล' : 'ข')}</td>`).join('')}
+                  <td class="border border-slate-500 p-1.5 font-bold">${s.attendancePct}%</td>
+                  <td class="border border-slate-500 p-1.5">${s.attendancePct >= 80 ? 'ปกติ' : 'มส'}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } else if (tab === 'scores') {
+        area.innerHTML = `
+          <h3 class="text-sm font-bold mb-2">ส่วนที่ 3: บันทึกคะแนนและตัดสินผลการเรียน (${courseText})</h3>
+          <table class="w-full border-collapse border border-slate-500 text-center">
+            <thead class="bg-slate-100">
+              <tr>
+                <th class="border border-slate-500 p-2">เลขที่</th>
+                <th class="border border-slate-500 p-2 text-left">ชื่อ - ชื่อสกุล</th>
+                <th class="border border-slate-500 p-2">ระหว่างทาง (35)</th>
+                <th class="border border-slate-500 p-2">ปลายทาง (35)</th>
+                <th class="border border-slate-500 p-2">กลางปี (15)</th>
+                <th class="border border-slate-500 p-2">ปลายปี (15)</th>
+                <th class="border border-slate-500 p-2 font-bold">รวม (100)</th>
+                <th class="border border-slate-500 p-2 font-bold">เกรด</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map((s, i) => `
+                <tr>
+                  <td class="border border-slate-500 p-2">${i+1}</td>
+                  <td class="border border-slate-500 p-2 text-left">${s.name}</td>
+                  <td class="border border-slate-500 p-2">${s.formative}</td>
+                  <td class="border border-slate-500 p-2">${s.summative}</td>
+                  <td class="border border-slate-500 p-2">${s.midterm}</td>
+                  <td class="border border-slate-500 p-2">${s.final}</td>
+                  <td class="border border-slate-500 p-2 font-bold">${getTotalScore(s)}</td>
+                  <td class="border border-slate-500 p-2 font-bold">${getOfficialGrade(s)}</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      } else {
+        area.innerHTML = `
+          <h3 class="text-sm font-bold mb-2">ส่วนที่ 4: ผลการประเมินคุณลักษณะอันพึงประสงค์ 8 ประการ และการอ่าน คิดวิเคราะห์ เขียน</h3>
+          <table class="w-full border-collapse border border-slate-500 text-center">
+            <thead class="bg-slate-100">
+              <tr>
+                <th class="border border-slate-500 p-2">เลขที่</th>
+                <th class="border border-slate-500 p-2 text-left">ชื่อ - ชื่อสกุล</th>
+                ${['1.รักชาติ','2.ซื่อสัตย์','3.มีวินัย','4.ใฝ่รู้','5.พอเพียง','6.มุ่งมั่น','7.รักไทย','8.จิตสาธารณะ'].map(t => `<th class="border border-slate-500 p-1.5 text-[10px]">${t}</th>`).join('')}
+                <th class="border border-slate-500 p-2 font-bold">สรุปคุณลักษณะฯ</th>
+                <th class="border border-slate-500 p-2 font-bold">สรุปอ่านคิดเขียน</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${students.map((s, i) => `
+                <tr>
+                  <td class="border border-slate-500 p-2">${i+1}</td>
+                  <td class="border border-slate-500 p-2 text-left">${s.name}</td>
+                  ${Array(8).fill(s.trait).map(v => `<td class="border border-slate-500 p-1.5">${v}</td>`).join('')}
+                  <td class="border border-slate-500 p-2 font-bold">${s.trait} (ดีเยี่ยม)</td>
+                  <td class="border border-slate-500 p-2 font-bold">${s.reading} (ดีเยี่ยม)</td>
+                </tr>
+              `).join('')}
+            </tbody>
+          </table>
+        `;
+      }
+    }
+
+    function switchCourse() {
+      const select = document.getElementById('courseSelect');
+      currentCourse = select.value;
+      students = getRosterForCourse(currentCourse);
+      activeStudentIdx = 0;
+      renderAll();
+    }
+
+    setInterval(() => {
+      const now = new Date();
+      document.getElementById('digitalClock').innerText = now.toTimeString().split(' ')[0];
+    }, 1000);
+
+    renderAll();
+  </script>
+</body>
+</html>

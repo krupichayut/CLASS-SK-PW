@@ -1,36 +1,50 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Classroom Management & ปพ.5 System
 
-## Getting Started
+ระบบสารสนเทศเพื่อการจัดการชั้นเรียนและรายงานผล ปพ.5 สำหรับครูผู้สอน ออกแบบตามมาตรฐาน Modern UI/UX (Apple/Vercel Aesthetic) เน้นความสะอาดตา ลดภาระงานเอกสาร และประมวลผลคะแนนอัตโนมัติ
 
-First, run the development server:
+## 🚀 ฟีเจอร์หลัก (Features)
+- **ระบบสมุดบันทึกคะแนน (Scorebook Engine)**: กรอกคะแนนแบบ Spreadsheet, คำนวณเกรดอัตโนมัติ 8 ระดับ
+- **ระบบบันทึกเวลาเรียน (Attendance)**: เช็กชื่อรายวัน/รายคาบ
+- **การจัดการหลักสูตร**: รองรับโครงสร้างตัวชี้วัด (Indicators) ตามมาตรฐานหลักสูตร
+- **ระบบสร้างรายงาน ปพ.5 (Excel Generator)**: ส่งออกข้อมูลคะแนนเป็นไฟล์ Excel (.xlsx) แบบมีเส้นตารางและฟอนต์ TH SarabunPSK
+- **ดีไซน์ Enterprise Grade**: รองรับ Responsive, สีโทนสว่าง (Light Slate), ถนอมสายตา
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🛠️ Technology Stack
+- **Frontend**: Next.js 15 (App Router), React 19, Tailwind CSS v4, shadcn/ui
+- **Backend/Database**: Firebase (Auth, Firestore)
+- **Utilities**: Zod, React Hook Form, ExcelJS
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 💻 การติดตั้งและเรียกใช้งาน (Local Development)
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+1. **ติดตั้ง Dependencies**
+   ```bash
+   npm install
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+2. **ตั้งค่าฐานข้อมูล (Firebase)**
+   - คัดลอกไฟล์ `.env.example` เป็น `.env.local`
+   - นำค่า Config จาก Firebase Console (Project Settings) มาใส่ให้ครบถ้วน
+   - หากยังไม่มีรหัส สามารถรัน UI เพื่อทดสอบแบบ Local State ได้
 
-## Learn More
+3. **รันระบบ (Development Server)**
+   ```bash
+   npm run dev
+   ```
+   เข้าใช้งานผ่านเบราว์เซอร์ที่ `http://localhost:3000`
 
-To learn more about Next.js, take a look at the following resources:
+## 📦 การนำขึ้นระบบจริง (Deployment)
+ระบบนี้ถูกออกแบบมาให้ทำงานได้ดีที่สุดบน **Vercel**
+1. พุชโค้ดขึ้น GitHub Repository
+2. ล็อกอินเข้า Vercel และเลือก Import Project
+3. ตั้งค่า Environment Variables (นำค่าจาก `.env.local` ไปใส่ใน Vercel)
+4. กด Deploy
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📄 โครงสร้างโปรเจกต์
+- `/src/app/(dashboard)` - หน้าจอหลักทั้งหมดของระบบ
+- `/src/components` - UI Components ที่ใช้ซ้ำ (shadcn/ui)
+- `/src/lib/calculations/engine.ts` - ลอจิกการคำนวณคะแนนและการตัดเกรด (มี Unit Tests ผ่าน 100%)
+- `/src/lib/excel/generator.ts` - ลอจิกการสร้างไฟล์ ปพ.5
+- `/src/lib/firebase/services.ts` - ฟังก์ชันสำหรับติดต่อ Firestore
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+*Developed by Antigravity AI*
