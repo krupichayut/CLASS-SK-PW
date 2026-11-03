@@ -30,6 +30,10 @@ export interface StudentAttendanceSummary {
   term1Percent?: number | null;
   term2Attended?: number;
   term2Total?: number;
+  term2Percent?: number;
+  cumulativeAttended?: number;
+  cumulativeTotal?: number;
+  cumulativePercent?: number;
 }
 
 /**
@@ -93,6 +97,7 @@ export function calculateAttendanceSummaries(
 
     const term2Attended = present + leave + activity + late;
     const term2Total = present + absent + leave + late + activity;
+    const term2Percent = term2Total > 0 ? Math.round((term2Attended / term2Total) * 100) : 100;
 
     // ตรวจสอบและดึงข้อมูลเวลาเรียนทุนเดิมเทอม 1
     const t1Baseline = term1Baselines?.[student.id];
@@ -158,7 +163,11 @@ export function calculateAttendanceSummaries(
       term1Total: t1Total,
       term1Percent: t1Percent,
       term2Attended,
-      term2Total
+      term2Total,
+      term2Percent,
+      cumulativeAttended,
+      cumulativeTotal,
+      cumulativePercent: attendancePercent
     };
   });
 }
