@@ -59,6 +59,7 @@ import {
 } from "@/lib/calculations/attendance";
 import { isDateWithinTerm } from "@/lib/dateUtils";
 import { ClassroomSeatingGrid } from "@/components/attendance/ClassroomSeatingGrid";
+import { AttendanceMatrixView } from "@/components/attendance/AttendanceMatrixView";
 import { StudentInspectorDrawer } from "@/components/students/StudentInspectorDrawer";
 import { DynamicIsland } from "@/components/ui/DynamicIsland";
 import { useThaiVoiceCheckIn } from "@/lib/speech/useThaiVoiceCheckIn";
@@ -96,6 +97,7 @@ function SmartAttendanceContent() {
 
   const [students, setStudents] = useState<StudentRecord[]>([]);
   const [activeYearDoc, setActiveYearDoc] = useState<AcademicYearDoc | null>(null);
+  const [attendanceTab, setAttendanceTab] = useState<"daily" | "matrix">("daily");
   const [viewMode, setViewMode] = useState<"seating" | "table">("seating");
   const [selectedDate, setSelectedDate] = useState(() => new Date().toISOString().split("T")[0]);
   const [selectedPeriod, setSelectedPeriod] = useState("period-1");
@@ -393,7 +395,59 @@ function SmartAttendanceContent() {
 
   return (
     <div className="space-y-6">
-      {/* 🚀 COMPACT BENTO HUD BAR (Spatial Dark Command Center) */}
+      {/* 🧭 PRIMARY VIEW MODE TABS (Daily Check-in vs Matrix & Stats) */}
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 pb-2 border-b border-white/10">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-indigo-600 to-cyan-500 text-white flex items-center justify-center shadow-[0_0_16px_rgba(99,102,241,0.5)] shrink-0">
+            <CalendarCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <h1 className="text-lg sm:text-xl font-extrabold text-slate-100 flex items-center gap-2">
+              <span>ระบบบริหารเวลาเรียน</span>
+              <span className="text-xs px-2.5 py-0.5 rounded-full bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 font-mono font-bold">
+                ห้อง {selectedRoom}
+              </span>
+            </h1>
+            <p className="text-xs text-slate-400 mt-0.5">
+              {attendanceTab === "daily" 
+                ? "บันทึกเวลาเรียนรายคาบด้วยผังห้องเรียน หรือตารางเช็กชื่อพร้อมระบบสั่งการด้วยเสียง"
+                : "สมุดบันทึกเวลาเรียนรวมทุกคาบ ตารางเมทริกซ์ และการวิเคราะห์สถิติตามเกณฑ์ สพฐ. 80%"}
+            </p>
+          </div>
+        </div>
+
+        {/* Primary Segmented Tab Switcher */}
+        <div className="flex items-center p-1 rounded-2xl bg-slate-900/90 border border-white/10 shadow-lg text-xs font-mono self-stretch sm:self-auto justify-center">
+          <button
+            type="button"
+            onClick={() => setAttendanceTab("daily")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+              attendanceTab === "daily"
+                ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-bold shadow-md shadow-indigo-500/25 scale-[1.02]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <Clock className="w-4 h-4" />
+            <span>เช็กชื่อประจำวัน</span>
+          </button>
+          <button
+            type="button"
+            onClick={() => setAttendanceTab("matrix")}
+            className={`flex items-center gap-2 px-4 py-2 rounded-xl transition-all ${
+              attendanceTab === "matrix"
+                ? "bg-gradient-to-r from-indigo-600 to-cyan-600 text-white font-bold shadow-md shadow-indigo-500/25 scale-[1.02]"
+                : "text-slate-400 hover:text-white"
+            }`}
+          >
+            <TableIcon className="w-4 h-4" />
+            <span>สมุดเวลาเรียนรวม & สถิติ</span>
+          </button>
+        </div>
+      </div>
+
+      {attendanceTab === "daily" ? (
+        <>
+          {/* 🚀 COMPACT BENTO HUD BAR (Spatial Dark Command Center) */}
       <div className="rounded-2xl bg-slate-900/80 backdrop-blur-2xl border border-white/10 shadow-2xl p-3 sm:p-4 space-y-3">
         <div className="flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-3">
           
@@ -907,6 +961,27 @@ function SmartAttendanceContent() {
           </span>
         </div>
       </div>
+      </>
+      ) : (
+        <AttendanceMatrixView
+          students={students}
+          history={history}
+          summaries={summaries}
+          courseHours={courseHours}
+          selectedRoom={selectedRoom}
+          selectedSubject={currentSubject}
+          subjects={subjects}
+          classrooms={classrooms}
+          selectedSubjectId={selectedSubjectId}
+          onSubjectChange={handleSubjectChange}
+          onRoomChange={(room) => setSelectedRoom(room)}
+          onSelectSession={(date, period) => {
+            setSelectedDate(date);
+            setSelectedPeriod(period);
+            setAttendanceTab("daily");
+          }}
+        />
+      )}
 
       {/* 360° Student Spatial Inspector Drawer */}
       <StudentInspectorDrawer
